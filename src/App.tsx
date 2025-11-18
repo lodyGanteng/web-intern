@@ -1,6 +1,6 @@
 import React, { useState, useContext, createContext } from 'react';
 import {
-  HashRouter, // PENTING: Menggunakan HashRouter
+  BrowserRouter as Router, // Ganti: Menggunakan BrowserRouter untuk URL Bersih
   Routes,
   Route,
   Link,
@@ -29,7 +29,8 @@ function RequireAuth({ children }: { children: JSX.Element }) {
   const auth = useAuth();
   const location = useLocation();
   if (!auth.user) {
-    return <LoginPage from={location.pathname} />;
+    // Perhatikan: Karena kita menggunakan BrowserRouter, kita tidak perlu membersihkan URL '#/' lagi
+    return <LoginPage from={location.pathname} />; 
   }
   return children;
 }
@@ -43,6 +44,7 @@ const LoginPage = ({ from }: { from: string }) => {
     e.preventDefault();
     if (username.trim()) {
       auth.signIn(username.trim(), () => {
+        // Navigasi ke rute yang diminta setelah login
         navigate(from || '/admin', { replace: true });
       });
     }
@@ -78,7 +80,7 @@ const AdminDashboardPage = () => {
 const ContentEditorPage = () => (
   <div className="p-6 bg-white rounded-xl shadow-2xl">
     <h1 className="text-3xl font-extrabold text-teal-700">Editor Konten Website</h1>
-    <p className="text-lg text-gray-600">Rute yang sebelumnya 404, sekarang harusnya berfungsi!</p>
+    <p className="text-lg text-gray-600">Rute yang sekarang harusnya tanpa tanda pagar (#).</p>
   </div>
 );
 const NotFoundPage = () => (
@@ -95,7 +97,8 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
   const handleSignOut = () => { auth.signOut(() => { navigate('/', { replace: true }); }); };
   const location = useLocation();
 
-  const isRouteActive = (path: string) => location.hash.substring(1) === path;
+  // Hapus logika HashRouter; sekarang kita hanya membandingkan pathname
+  const isRouteActive = (path: string) => location.pathname === path;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -105,12 +108,13 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
           <Link to="/" className={isRouteActive('/') ? "text-indigo-700" : "text-gray-600"}>Beranda</Link>
           {auth.user && (
             <>
-              <Link to="/admin" className={isRouteActive('/admin') ? "text-indigo-700" : "text-gray-600"}>Dashboard</Link>
+              {/* Gunakan location.pathname.startsWith('/admin') untuk highlight di sini jika perlu */}
+              <Link to="/admin" className={location.pathname.startsWith('/admin') ? "text-indigo-700" : "text-gray-600"}>Dashboard</Link>
               <Link to="/admin/edit-content" className={isRouteActive('/admin/edit-content') ? "text-indigo-700" : "text-gray-600"}>Editor</Link>
               <button onClick={handleSignOut} className="text-red-600">Keluar ({auth.user})</button>
             </>
           )}
-          {!auth.user && <Link to="/login" className="text-indigo-600">Login</Link>}
+          {!auth.user && <Link to="/login" className={isRouteActive('/login') ? "text-indigo-700" : "text-gray-600"}>Login</Link>}
         </div>
       </nav>
       <main className="max-w-7xl mx-auto p-6">{children}</main>
@@ -123,19 +127,19 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
 export default function App() {
   return (
     <AuthProvider>
-      <HashRouter> {/* Menggunakan HashRouter */}
+      <Router> {/* Ganti: Menggunakan Router (BrowserRouter) */}
         <MainLayout>
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/login" element={<LoginPage from="/admin" />} />
             
             <Route path="/admin" element={<RequireAuth><AdminDashboardPage /></RequireAuth>} />
-            <Route path="/admin/edit-content" element={<RequireAuth><ContentEditorPage /></RequireAuth>} /> {/* Rute yang bermasalah */}
+            <Route path="/admin/edit-content" element={<RequireAuth><ContentEditorPage /></RequireAuth>} /> 
 
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </MainLayout>
-      </HashRouter>
+      </Router>
     </AuthProvider>
   );
 }
