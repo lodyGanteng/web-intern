@@ -1,11 +1,12 @@
 import React, { useState, useContext, createContext } from 'react';
 import {
-  HashRouter, // PENTING: Menggunakan HashRouter
+  HashRouter, // PENTING: Menggunakan HashRouter (Solusi Vercel 404)
   Routes,
   Route,
   Link,
   useNavigate,
   useLocation,
+  Outlet, // PENTING: Untuk Nested Routing
 } from 'react-router-dom';
 import { LayoutDashboard, Home, Edit, LogOut, Lock } from 'lucide-react';
 
@@ -29,7 +30,8 @@ function RequireAuth({ children }: { children: JSX.Element }) {
   const auth = useAuth();
   const location = useLocation();
   if (!auth.user) {
-    return <LoginPage from={location.pathname} />;
+    // Redirect ke Login Page jika belum login
+    return <LoginPage from={location.pathname} />; 
   }
   return children;
 }
@@ -43,6 +45,7 @@ const LoginPage = ({ from }: { from: string }) => {
     e.preventDefault();
     if (username.trim()) {
       auth.signIn(username.trim(), () => {
+        // Navigasi ke rute yang diminta setelah login
         navigate(from || '/admin', { replace: true });
       });
     }
@@ -60,6 +63,8 @@ const LoginPage = ({ from }: { from: string }) => {
   );
 };
 const HomePage = () => (
+  // Ini adalah Halaman yang hanya berisi konten utama (tanpa Navbar/Layout)
+  // *Asumsi* konten 'MAGANG KUY!' ada di sini atau dimuat di sini.
   <div className="p-8 bg-white rounded-lg shadow-lg">
     <h1 className="text-4xl font-bold">Selamat Datang di Portal Kami!</h1>
     <Link to="/admin" className="mt-4 inline-flex px-4 py-2 bg-green-600 text-white rounded-lg">Pergi ke Dashboard Admin</Link>
@@ -78,7 +83,7 @@ const AdminDashboardPage = () => {
 const ContentEditorPage = () => (
   <div className="p-6 bg-white rounded-xl shadow-2xl">
     <h1 className="text-3xl font-extrabold text-teal-700">Editor Konten Website</h1>
-    <p className="text-lg text-gray-600">Rute yang sebelumnya 404, sekarang harusnya berfungsi!</p>
+    <p className="text-lg text-gray-600">Halaman ini dimuat dari rute Admin.</p>
   </div>
 );
 const NotFoundPage = () => (
@@ -110,7 +115,7 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
               <button onClick={handleSignOut} className="text-red-600">Keluar ({auth.user})</button>
             </>
           )}
-          {!auth.user && <Link to="/login" className="text-indigo-600">Login</Link>}
+          {!auth.user && <Link to="/login" className={isRouteActive('/login') ? "text-indigo-700" : "text-gray-600"}>Login</Link>}
         </div>
       </nav>
       <main className="max-w-7xl mx-auto p-6">{children}</main>
@@ -118,23 +123,32 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
+// Komponen Layout Wrapper yang akan digunakan untuk Nested Routes
+const LayoutWrapper = () => (
+  <MainLayout>
+    <Outlet /> {/* Outlet akan merender komponen anak yang cocok dengan rute */}
+  </MainLayout>
+);
 
-// === 5. KOMPONEN UTAMA APLIKASI ===
+
+// === 5. KOMPONEN UTAMA APLIKASI (PERBAIKAN FINAL) ===
 export default function App() {
   return (
     <AuthProvider>
-      <HashRouter> {/* Menggunakan HashRouter */}
-        <MainLayout>
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/login" element={<LoginPage from="/admin" />} />
-            
-            <Route path="/admin" element={<RequireAuth><AdminDashboardPage /></RequireAuth>} />
-            <Route path="/admin/edit-content" element={<RequireAuth><ContentEditorPage /></RequireAuth>} /> {/* Rute yang bermasalah */}
+      <HashRouter>
+        <Routes>
+          {/* 1. Rute TANPA MainLayout (Login, 404) */}
+          <Route path="/login" element={<LoginPage from="/admin" />} />
+          <Route path="*" element={<NotFoundPage />} />
 
-            <Route path="*" element={<NotFoundPage />} />
-          </Routes>
-        </MainLayout>
+          {/* 2. Rute DENGAN MainLayout (Nested Routes) */}
+          {/* Route parent ini akan merender LayoutWrapper (yang berisi Navbar/Layout) */}
+          <Route element={<LayoutWrapper />}>
+            <Route path="/" element={<HomePage />} /> 
+            <Route path="/admin" element={<RequireAuth><AdminDashboardPage /></RequireAuth>} />
+            <Route path="/admin/edit-content" element={<RequireAuth><ContentEditorPage /></RequireAuth>} />
+          </Route>
+        </Routes>
       </HashRouter>
     </AuthProvider>
   );
