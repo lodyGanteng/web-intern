@@ -1,20 +1,18 @@
 import React, { 
-    // FUNGSI REACT HOOKS: MEMPERBAIKI ERROR 2304
     useState, 
     useContext, 
     createContext, 
     useEffect, 
 } from 'react';
 import {
-    // REACT ROUTER DOM
-    BrowserRouter as Router, // Menggunakan BrowserRouter
+    BrowserRouter as Router, // Menggunakan BrowserRouter untuk URL bersih
     Routes,
     Route,
     Link,
     useNavigate,
     useLocation,
     Outlet,
-    Navigate, // MEMPERBAIKI ERROR 'Cannot find name Navigate'
+    Navigate, 
 } from 'react-router-dom';
 import { LogOut, Home, Lock, User, Menu } from 'lucide-react';
 
@@ -76,8 +74,8 @@ function ProtectedRoute({ children }: { children: JSX.Element }) {
     const location = useLocation();
 
     if (!auth.user) {
-        // Arahkan ke halaman login jika belum login
-        return <Navigate to="/login" state={{ from: location }} replace />;
+        // Arahkan ke halaman login-admin jika belum login
+        return <Navigate to="/login-admin" state={{ from: location }} replace />; 
     }
 
     return children;
@@ -126,9 +124,10 @@ const AppLayout = () => {
                             </button>
                         </>
                     ) : (
-                        <Link to="/login" className="w-full justify-center bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-200 block text-center">
+                        // Link Masuk mengarah ke /login-admin
+                        <Link to="/login-admin" className="w-full justify-center bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-200 block text-center">
                             Masuk
-                        </Link>
+                        </Link> 
                     )}
                 </div>
             </nav>
@@ -156,7 +155,8 @@ const AppLayout = () => {
                                 <button onClick={handleSignOut} className="w-full bg-indigo-600 text-white py-2 rounded-lg">Keluar</button>
                             </>
                         ) : (
-                            <Link to="/login" className="w-full bg-green-600 text-white py-2 rounded-lg block text-center">Masuk</Link>
+                            // Link Masuk mengarah ke /login-admin
+                            <Link to="/login-admin" className="w-full bg-green-600 text-white py-2 rounded-lg block text-center">Masuk</Link> 
                         )}
                     </div>
                 )}
@@ -236,11 +236,9 @@ const LoginPage = () => {
     e.preventDefault();
     setError('');
 
-    // Simulasi Otentikasi
-    // Gunakan username: admin dan password: 123
+    // Kredensial Mock: username: admin dan password: 123
     if (username === 'admin' && password === '123') {
       auth.signIn(username, () => {
-        // Navigasi ke rute asal atau default
         navigate(from, { replace: true });
       });
     } else {
@@ -324,7 +322,7 @@ export default function App() {
         <AuthProvider>
             <Routes>
                 {/* Rute Login & 404 tanpa Layout (Full Screen) */}
-                <Route path="/login" element={<LoginPage />} />
+                <Route path="/login-admin" element={<LoginPage />} /> 
                 <Route path="*" element={<NotFoundPage />} /> 
 
                 {/* Rute dengan Layout (Sidebar + Navbar) */}
