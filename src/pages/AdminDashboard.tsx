@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase'; 
+import { Link } from 'react-router-dom'; // <--- BARU: Untuk navigasi
+import { FileEdit } from 'lucide-react'; // <--- BARU: Untuk ikon
 
 interface Application {
     id: number;
@@ -22,7 +24,6 @@ const AdminDashboard: React.FC = () => {
             setLoading(true);
             setError(null);
             
-            // SELECT hanya akan berhasil karena Policy RLS
             const { data, error } = await supabase
                 .from('internship_applications')
                 .select('*') 
@@ -43,28 +44,43 @@ const AdminDashboard: React.FC = () => {
     const handleLogout = async () => {
         const { error } = await supabase.auth.signOut();
         if (!error) {
-            // ProtectedRoute akan mendeteksi logout dan mengarahkan
-            alert('Anda telah logout!');
+            // Karena tidak ada global context di sini, kita reload untuk simulasi signout
+            window.location.reload(); 
         }
     };
 
-    if (loading) return <div className="p-10 text-center">Memuat data pendaftar...</div>;
+    if (loading) return <div className="p-10 text-center text-gray-700">Memuat data pendaftar...</div>;
     if (error) return <div className="p-10 text-center text-red-600 font-semibold">{error}</div>;
 
     return (
-        <div className="p-6 md:p-10 bg-gray-50 min-h-screen">
-            <div className="flex justify-between items-center mb-6 border-b pb-4">
-                <h2 className="text-3xl font-extrabold text-indigo-800">Data Pendaftaran ({applications.length})</h2>
-                <button 
-                  onClick={handleLogout} 
-                  className="px-4 py-2 bg-red-600 text-white rounded-lg shadow hover:bg-red-700 transition duration-150"
-                >
-                    Logout
-                </button>
+        <div className="p-6 md:p-10 bg-gray-50 min-h-screen font-sans">
+            <div className="flex flex-col md:flex-row justify-between md:items-center mb-8 border-b pb-4">
+                <h2 className="text-3xl font-extrabold text-indigo-800 mb-4 md:mb-0">
+                    Data Pendaftaran ({applications.length})
+                </h2>
+                <div className="flex space-x-4">
+                    
+                    {/* BARU: Tombol Edit Konten menggunakan Link */}
+                    <Link 
+                        to="/admin/edit-content" 
+                        className="flex items-center space-x-2 px-4 py-2 bg-purple-600 text-white rounded-lg shadow-md hover:bg-purple-700 transition duration-150 font-semibold text-sm"
+                    >
+                        <FileEdit size={18} />
+                        <span>Edit Konten</span>
+                    </Link>
+
+                    {/* Tombol Logout yang Sudah Ada */}
+                    <button 
+                        onClick={handleLogout} 
+                        className="px-4 py-2 bg-red-600 text-white rounded-lg shadow-md hover:bg-red-700 transition duration-150 font-semibold text-sm"
+                    >
+                        Logout
+                    </button>
+                </div>
             </div>
             
             {/* Tabel Data Pendaftar */}
-            <div className="overflow-x-auto bg-white rounded-lg shadow-xl">
+            <div className="overflow-x-auto bg-white rounded-xl shadow-xl">
                 <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-indigo-50">
                         <tr>
@@ -77,12 +93,12 @@ const AdminDashboard: React.FC = () => {
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
                         {applications.map((app) => (
-                            <tr key={app.id} className="hover:bg-gray-50">
+                            <tr key={app.id} className="hover:bg-gray-50 transition">
                                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{app.full_name}</td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{app.email}</td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-indigo-600 font-semibold">{app.position}</td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{app.school_university}</td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{new Date(app.created_at).toLocaleDateString()}</td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{new Date(app.created_at).toLocaleDateString('id-ID', { year: 'numeric', month: 'short', day: 'numeric' })}</td>
                             </tr>
                         ))}
                     </tbody>
