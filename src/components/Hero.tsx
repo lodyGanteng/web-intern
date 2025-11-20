@@ -1,11 +1,16 @@
+// src/components/Hero.tsx
+
 import { Rocket, Sparkles } from 'lucide-react';
 
+// <-- DIUBAH: Tambahkan 'heroContent' ke dalam interface -->
 interface HeroProps {
+  heroContent: any;
   onDaftarClick: () => void;
   onPelajariClick: () => void;
 }
 
-export default function Hero({ onDaftarClick, onPelajariClick }: HeroProps) {
+// <-- DIUBAH: Tambahkan 'heroContent' ke parameter fungsi -->
+export default function Hero({ heroContent, onDaftarClick, onPelajariClick }: HeroProps) {
   return (
     <section className="relative bg-gradient-to-br from-emerald-600 via-green-500 to-lime-500 text-white overflow-hidden min-h-screen flex items-center">
       <div className="absolute inset-0">
@@ -22,14 +27,17 @@ export default function Hero({ onDaftarClick, onPelajariClick }: HeroProps) {
             <span className="text-sm font-bold text-white">Program Magang 2025</span>
           </div>
 
+          {/* <-- DIUBAH: Gunakan data dari Supabase untuk Judul Utama --> */}
           <h1 className="text-6xl sm:text-7xl lg:text-8xl font-black leading-tight mb-8 tracking-tight drop-shadow-2xl">
-            MAGANG KUY!
+            {heroContent?.mainTitle || 'MAGANG KUY!'}
           </h1>
 
+          {/* <-- DIUBAH: Gunakan data dari Supabase untuk Sub Judul --> */}
           <p className="text-2xl sm:text-3xl font-bold text-white mb-6 drop-shadow-lg">
-            Kesempatan Magang untuk Siswa SMK & Mahasiswa
+            {heroContent?.subTitle || 'Kesempatan Magang untuk Siswa SMK & Mahasiswa'}
           </p>
 
+          {/* Teks deskripsi panjang ini kita biarkan statis dulu, karena tidak ada di database */}
           <p className="text-lg sm:text-xl text-white/95 mb-12 max-w-3xl mx-auto leading-relaxed font-medium">
             Dapatkan pengalaman kerja profesional, bimbingan mentor, pelatihan skill,
             dan sertifikat resmi. Wujudkan impianmu di dunia kerja bersama kami!
@@ -40,8 +48,9 @@ export default function Hero({ onDaftarClick, onPelajariClick }: HeroProps) {
               onClick={onDaftarClick}
               className="group bg-yellow-400 hover:bg-yellow-300 text-slate-900 font-black text-xl px-12 py-6 rounded-full transition-all duration-300 shadow-2xl hover:shadow-yellow-400/60 hover:scale-110 transform"
             >
+              {/* <-- DIUBAH: Gunakan data dari Supabase untuk Teks Tombol --> */}
               <span className="flex items-center justify-center gap-3">
-                Daftar Sekarang
+                {heroContent?.buttonText || 'Daftar Sekarang'}
                 <Rocket className="w-6 h-6 group-hover:translate-x-2 transition-transform" />
               </span>
             </button>
