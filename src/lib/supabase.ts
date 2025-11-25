@@ -23,3 +23,4 @@ export const supabase = createClient(
 );
 
 console.log("Klien Supabase berhasil diinisialisasi.");
+export type { User, Session } from '@supabase/supabase-js'

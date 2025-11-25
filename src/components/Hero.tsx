@@ -1,16 +1,14 @@
-// src/components/Hero.tsx
-
 import { Rocket, Sparkles } from 'lucide-react';
 
-// <-- DIUBAH: Tambahkan 'heroContent' ke dalam interface -->
 interface HeroProps {
-  heroContent: any;
+  homepage_content: any;   // ⬅ ini penting supaya data dari App.tsx masuk
   onDaftarClick: () => void;
   onPelajariClick: () => void;
 }
 
-// <-- DIUBAH: Tambahkan 'heroContent' ke parameter fungsi -->
-export default function Hero({ heroContent, onDaftarClick, onPelajariClick }: HeroProps) {
+export default function Hero({ homepage_content, onDaftarClick, onPelajariClick }: HeroProps) {
+  if (!homepage_content) return null;
+
   return (
     <section className="relative bg-gradient-to-br from-emerald-600 via-green-500 to-lime-500 text-white overflow-hidden min-h-screen flex items-center">
       <div className="absolute inset-0">
@@ -22,35 +20,38 @@ export default function Hero({ heroContent, onDaftarClick, onPelajariClick }: He
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
         <div className="text-center">
+
+          {/* BADGE (dynamic) */}
           <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm border border-white/30 rounded-full px-6 py-3 mb-8 animate-bounce">
             <Sparkles className="w-5 h-5 text-yellow-300" />
-            <span className="text-sm font-bold text-white">Program Magang 2025</span>
+            <span className="text-sm font-bold text-white">
+              {homepage_content.badgeText}
+            </span>
           </div>
 
-          {/* <-- DIUBAH: Gunakan data dari Supabase untuk Judul Utama --> */}
+          {/* MAIN TITLE (dynamic) */}
           <h1 className="text-6xl sm:text-7xl lg:text-8xl font-black leading-tight mb-8 tracking-tight drop-shadow-2xl">
-            {heroContent?.mainTitle || 'MAGANG KUY!'}
+            {homepage_content.mainTitle}
           </h1>
 
-          {/* <-- DIUBAH: Gunakan data dari Supabase untuk Sub Judul --> */}
+          {/* SUBTITLE (dynamic) */}
           <p className="text-2xl sm:text-3xl font-bold text-white mb-6 drop-shadow-lg">
-            {heroContent?.subTitle || 'Kesempatan Magang untuk Siswa SMK & Mahasiswa'}
+            {homepage_content.subTitle}
           </p>
 
-          {/* Teks deskripsi panjang ini kita biarkan statis dulu, karena tidak ada di database */}
+          {/* DESCRIPTION (dynamic) */}
           <p className="text-lg sm:text-xl text-white/95 mb-12 max-w-3xl mx-auto leading-relaxed font-medium">
-            Dapatkan pengalaman kerja profesional, bimbingan mentor, pelatihan skill,
-            dan sertifikat resmi. Wujudkan impianmu di dunia kerja bersama kami!
+            {homepage_content.longDescription}
           </p>
 
+          {/* BUTTONS (dynamic) */}
           <div className="flex flex-col sm:flex-row gap-5 justify-center items-center mb-16">
             <button
               onClick={onDaftarClick}
               className="group bg-yellow-400 hover:bg-yellow-300 text-slate-900 font-black text-xl px-12 py-6 rounded-full transition-all duration-300 shadow-2xl hover:shadow-yellow-400/60 hover:scale-110 transform"
             >
-              {/* <-- DIUBAH: Gunakan data dari Supabase untuk Teks Tombol --> */}
               <span className="flex items-center justify-center gap-3">
-                {heroContent?.buttonText || 'Daftar Sekarang'}
+                {homepage_content.buttonText}
                 <Rocket className="w-6 h-6 group-hover:translate-x-2 transition-transform" />
               </span>
             </button>
@@ -59,31 +60,27 @@ export default function Hero({ heroContent, onDaftarClick, onPelajariClick }: He
               onClick={onPelajariClick}
               className="bg-white hover:bg-white/90 text-emerald-600 font-black text-xl px-12 py-6 rounded-full transition-all duration-300 shadow-2xl hover:scale-105 transform"
             >
-              Lihat Posisi Magang
+              {homepage_content.secondaryButtonText}
             </button>
           </div>
 
+          {/* STATS (dynamic mapping) */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-5xl mx-auto">
-            <div className="bg-white/20 backdrop-blur-sm rounded-3xl p-8 border-2 border-white/40 transform hover:scale-105 transition-transform">
-              <div className="text-5xl font-black text-yellow-300 mb-2">50+</div>
-              <div className="text-sm font-bold text-white">Peserta Magang</div>
-            </div>
-            <div className="bg-white/20 backdrop-blur-sm rounded-3xl p-8 border-2 border-white/40 transform hover:scale-105 transition-transform">
-              <div className="text-5xl font-black text-yellow-300 mb-2">10+</div>
-              <div className="text-sm font-bold text-white">Posisi Tersedia</div>
-            </div>
-            <div className="bg-white/20 backdrop-blur-sm rounded-3xl p-8 border-2 border-white/40 transform hover:scale-105 transition-transform">
-              <div className="text-5xl font-black text-yellow-300 mb-2">3-6</div>
-              <div className="text-sm font-bold text-white">Bulan Program</div>
-            </div>
-            <div className="bg-white/20 backdrop-blur-sm rounded-3xl p-8 border-2 border-white/40 transform hover:scale-105 transition-transform">
-              <div className="text-5xl font-black text-yellow-300 mb-2">100%</div>
-              <div className="text-sm font-bold text-white">Dapat Sertifikat</div>
-            </div>
+            {homepage_content.stats?.map((item: any, idx: number) => (
+              <div
+                key={idx}
+                className="bg-white/20 backdrop-blur-sm rounded-3xl p-8 border-2 border-white/40 transform hover:scale-105 transition-transform"
+              >
+                <div className="text-5xl font-black text-yellow-300 mb-2">{item.number}</div>
+                <div className="text-sm font-bold text-white">{item.label}</div>
+              </div>
+            ))}
           </div>
+
         </div>
       </div>
 
+      {/* SVG WAVE ORIGINAL */}
       <div className="absolute bottom-0 left-0 right-0">
         <svg viewBox="0 0 1440 120" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full">
           <path d="M0 120L60 105C120 90 240 60 360 45C480 30 600 30 720 37.5C840 45 960 60 1080 67.5C1200 75 1320 75 1380 75L1440 75V120H1380C1320 120 1200 120 1080 120C960 120 840 120 720 120C600 120 480 120 360 120C240 120 120 120 60 120H0Z" fill="white"/>

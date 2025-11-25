@@ -4,10 +4,13 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
-// Import halaman utama (yang berisi semua komponen)
+// Import halaman-halaman
 import App from './App'; 
-// Import halaman admin
 import AdminPage from './pages/AdminPage';
+import LoginPage from './pages/LoginPage'; // <-- Diimpor dari /pages
+
+// Import komponen utilitas
+import ProtectedRoute from './guards/ProtectedRoute'; // <-- Tetap di /components
 
 import './index.css';
 
@@ -15,9 +18,22 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <BrowserRouter>
       <Routes>
+        {/* ROUTE PUBLIK: Halaman utama */}
         <Route path="/" element={<App />} />
-        <Route path="/admin" element={<AdminPage />} />
+        
+        {/* ROUTE LOGIN: Halaman login */}
+        <Route path="/login" element={<LoginPage />} />
+
+        {/* ROUTE ADMIN YANG DILINDUNGI */}
+        <Route 
+          path="/admin" 
+          element={
+            <ProtectedRoute>
+              <AdminPage />
+            </ProtectedRoute>
+          } 
+        />
       </Routes>
     </BrowserRouter>
-  </React.StrictMode>
+  </React.StrictMode>,
 );

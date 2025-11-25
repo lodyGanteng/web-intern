@@ -8,32 +8,35 @@ const AdminPage: React.FC = () => {
   const [homeContent, setHomeContent] = useState<any>(null);
   // State untuk About
   const [aboutContent, setAboutContent] = useState<any>(null);
-  // --- TAMBAHKAN STATE UNTUK HOW IT WORKS ---
+  // State untuk How It Works
   const [howItWorksContent, setHowItWorksContent] = useState<any>(null);
   // State untuk Positions
   const [positionsContent, setPositionsContent] = useState<any>(null);
   // State untuk Benefits
   const [benefitsContent, setBenefitsContent] = useState<any>(null);
-  // --- TAMBAHKAN STATE UNTUK TESTIMONIALS ---
+  // State untuk Testimonials
   const [testimonialsContent, setTestimonialsContent] = useState<any>(null);
-  // --- TAMBAHKAN STATE UNTUK REGISTRATION ---
+  // State untuk Registration
   const [registrationContent, setRegistrationContent] = useState<any>(null);
-  // --- TAMBAHKAN STATE UNTUK FAQ ---
+  // State untuk FAQ
   const [faqContent, setFaqContent] = useState<any>(null);
-  // --- TAMBAHKAN STATE UNTUK CLOSING CTA ---
+  // State untuk Closing CTA
   const [closingCtaContent, setClosingCtaContent] = useState<any>(null);
-  // --- TAMBAHKAN STATE UNTUK FOOTER ---
+  // State untuk Footer
   const [footerContent, setFooterContent] = useState<any>(null);
-  
-  // --- TAMBAHKAN STATE UNTUK DATA PENDAFTAR ---
+
+  // Data pendaftar
   const [applicationsData, setApplicationsData] = useState<any[]>([]);
   const [applicationsLoading, setApplicationsLoading] = useState(true);
-  
+
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState('');
 
-  // Fungsi untuk mengambil data pendaftar
+
+  // ==========================================
+  // FETCH DATA PENDAFTAR
+  // ==========================================
   const fetchApplicationsData = async () => {
     setApplicationsLoading(true);
     try {
@@ -41,7 +44,7 @@ const AdminPage: React.FC = () => {
         .from('internship_applications')
         .select('*')
         .order('id', { ascending: false });
-      
+
       if (error) throw error;
       setApplicationsData(data || []);
     } catch (error: any) {
@@ -52,42 +55,41 @@ const AdminPage: React.FC = () => {
     }
   };
 
-  // Fungsi untuk menghapus aplikasi
-  const handleDeleteApplication = async (id: number) => {
-    if (!window.confirm('Apakah Anda yakin ingin menghapus aplikasi ini?')) return;
-    
-    try {
-      const { error } = await supabase
-        .from('internship_applications')
-        .delete()
-        .eq('id', id);
-      
-      if (error) throw error;
-      setMessage('Aplikasi berhasil dihapus!');
-      fetchApplicationsData(); // Refresh data
-      setTimeout(() => setMessage(''), 3000);
-    } catch (error: any) {
-      console.error('Error deleting application:', error);
-      setMessage(`Gagal menghapus: ${error.message}`);
-    }
-  };
 
-  // Fungsi untuk mengambil SEMUA data yang dibutuhkan
+  // ==========================================
+  // FETCH SEMUA CONTENT WEBSITE
+  // ==========================================
   const fetchAllContent = async () => {
     setLoading(true);
     setMessage('');
 
     try {
-      // Ambil data homepage
+      // HOMEPAGE
       const { data: homeData, error: homeError } = await supabase
         .from('site_content')
         .select('content')
         .eq('section', 'homepage_content')
         .single();
       if (homeError) throw homeError;
-      setHomeContent(homeData.content);
 
-      // Ambil data about
+      const fixedHome = {
+        stats: homeData.content?.stats ?? [
+          { label: '', number: '' },
+          { label: '', number: '' },
+          { label: '', number: '' },
+          { label: '', number: '' },
+        ],
+        subTitle: homeData.content?.subTitle ?? '',
+        badgeText: homeData.content?.badgeText ?? '',
+        mainTitle: homeData.content?.mainTitle ?? '',
+        buttonText: homeData.content?.buttonText ?? '',
+        secondaryButtonText: homeData.content?.secondaryButtonText ?? '',
+        longDescription: homeData.content?.longDescription ?? '',
+      };
+
+      setHomeContent(fixedHome);
+
+      // ABOUT
       const { data: aboutData, error: aboutError } = await supabase
         .from('site_content')
         .select('content')
@@ -96,7 +98,7 @@ const AdminPage: React.FC = () => {
       if (aboutError) throw aboutError;
       setAboutContent(aboutData.content);
 
-      // --- AMBIL DATA HOW IT WORKS ---
+      // HOW IT WORKS
       const { data: howItWorksData, error: howItWorksError } = await supabase
         .from('site_content')
         .select('content')
@@ -105,7 +107,7 @@ const AdminPage: React.FC = () => {
       if (howItWorksError) throw howItWorksError;
       setHowItWorksContent(howItWorksData.content);
 
-      // Ambil data positions
+      // POSITIONS
       const { data: positionsData, error: positionsError } = await supabase
         .from('site_content')
         .select('content')
@@ -114,7 +116,7 @@ const AdminPage: React.FC = () => {
       if (positionsError) throw positionsError;
       setPositionsContent(positionsData.content);
 
-      // Ambil data benefits
+      // BENEFITS
       const { data: benefitsData, error: benefitsError } = await supabase
         .from('site_content')
         .select('content')
@@ -123,7 +125,7 @@ const AdminPage: React.FC = () => {
       if (benefitsError) throw benefitsError;
       setBenefitsContent(benefitsData.content);
 
-      // --- AMBIL DATA TESTIMONIALS ---
+      // TESTIMONIALS
       const { data: testimonialsData, error: testimonialsError } = await supabase
         .from('site_content')
         .select('content')
@@ -132,7 +134,7 @@ const AdminPage: React.FC = () => {
       if (testimonialsError) throw testimonialsError;
       setTestimonialsContent(testimonialsData.content);
 
-      // --- AMBIL DATA REGISTRATION ---
+      // REGISTRATION
       const { data: registrationData, error: registrationError } = await supabase
         .from('site_content')
         .select('content')
@@ -141,7 +143,7 @@ const AdminPage: React.FC = () => {
       if (registrationError) throw registrationError;
       setRegistrationContent(registrationData.content);
 
-      // --- AMBIL DATA FAQ ---
+      // FAQ
       const { data: faqData, error: faqError } = await supabase
         .from('site_content')
         .select('content')
@@ -150,7 +152,7 @@ const AdminPage: React.FC = () => {
       if (faqError) throw faqError;
       setFaqContent(faqData.content);
 
-      // --- AMBIL DATA CLOSING CTA ---
+      // CLOSING CTA
       const { data: closingCtaData, error: closingCtaError } = await supabase
         .from('site_content')
         .select('content')
@@ -159,7 +161,7 @@ const AdminPage: React.FC = () => {
       if (closingCtaError) throw closingCtaError;
       setClosingCtaContent(closingCtaData.content);
 
-      // --- AMBIL DATA FOOTER ---
+      // FOOTER
       const { data: footerData, error: footerError } = await supabase
         .from('site_content')
         .select('content')
@@ -176,12 +178,16 @@ const AdminPage: React.FC = () => {
     }
   };
 
+
   useEffect(() => {
     fetchAllContent();
-    fetchApplicationsData(); // Ambil data pendaftar saat komponen dimuat
+    fetchApplicationsData();
   }, []);
 
-  // Fungsi untuk menyimpan perubahan
+
+  // ==========================================
+  // HANDLE SAVE
+  // ==========================================
   const handleSave = async (section: string, content: any) => {
     setSaving(true);
     setMessage('');
@@ -189,28 +195,52 @@ const AdminPage: React.FC = () => {
     try {
       const { error } = await supabase
         .from('site_content')
-        .update({ 
+        .update({
           content: content,
-          updated_at: new Date().toISOString()
+          updated_at: new Date().toISOString(),
         })
         .eq('section', section);
 
       if (error) throw error;
+
+      // Update state lokal
+      switch (section) {
+        case 'homepage_content': setHomeContent(content); break;
+        case 'about_content': setAboutContent(content); break;
+        case 'how_it_works_content': setHowItWorksContent(content); break;
+        case 'positions_content': setPositionsContent(content); break;
+        case 'benefits_content': setBenefitsContent(content); break;
+        case 'testimonials_content': setTestimonialsContent(content); break;
+        case 'registration_content': setRegistrationContent(content); break;
+        case 'faq_content': setFaqContent(content); break;
+        case 'closing_cta_content': setClosingCtaContent(content); break;
+        case 'footer_content': setFooterContent(content); break;
+      }
+
       setMessage('Perubahan berhasil disimpan!');
-      setTimeout(() => setMessage(''), 3000); // Pesan hilang setelah 3 detik
+      setTimeout(() => setMessage(''), 3000);
+
     } catch (error: any) {
-      console.error('Error saving content:', error);
+      console.error('Error saving:', error);
       setMessage(`Gagal menyimpan: ${error.message}`);
     } finally {
       setSaving(false);
     }
   };
 
+  // ============================
+  // LOADING SCREEN
+  // ============================
   if (loading) {
-    return <div className="container mx-auto p-8 text-center">Memuat data...</div>;
+    return (
+      <div className="container mx-auto p-8 text-center">
+        Memuat data...
+      </div>
+    );
   }
 
   const currentYear = new Date().getFullYear();
+
 
   return (
     <div className="container mx-auto p-8">
@@ -254,14 +284,7 @@ const AdminPage: React.FC = () => {
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {application.email}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <button
-                        onClick={() => handleDeleteApplication(application.id)}
-                        className="text-red-600 hover:text-red-900"
-                      >
-                        Hapus
-                      </button>
-                    </td>
+                
                   </tr>
                 ))}
               </tbody>

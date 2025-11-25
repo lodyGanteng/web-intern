@@ -22,11 +22,12 @@ type HowItWorksProps = {
 
 // 2. Buat pemetaan (map) dari nama string ke komponen ikon
 const iconMap: { [key: string]: React.ComponentType<any> } = {
-  ClipboardList,
-  GraduationCap,
-  Briefcase,
-  Award,
+  ClipboardList: ClipboardList,
+  GraduationCap: GraduationCap,
+  Briefcase: Briefcase,
+  Award: Award,
 };
+
 
 // 3. Terima props di komponen
 export default function HowItWorks({ howItWorksContent }: HowItWorksProps) {
